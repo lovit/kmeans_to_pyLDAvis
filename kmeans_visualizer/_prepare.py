@@ -145,7 +145,7 @@ def _get_topic_coordinates(centers, cluster_size):
     cluster_size = np.asarray(
         [np.sqrt(cluster_size[c] + 1) for c in range(n_clusters)])
     cs_min, cs_max = cluster_size.min(), cluster_size.max()
-    cluster_size = 3.5 * (cluster_size - cs_min) / (cs_max - cs_min) + 0.01
+    cluster_size = 3.5 * (cluster_size - cs_min) / (cs_max - cs_min) + 0.2
 
     topic_coordinates = [
         TopicCoordinates(c+1, coordinates[i,0], coordinates[i,1], i+1, 1, cluster_size[c])
