@@ -10,8 +10,9 @@ from .utils import _df_topic_coordinate
 from .utils import _df_topic_info
 from .utils import _df_token_table
 
-def kmeans_to_prepared_data(bow, index2word, centers, labels, n_words=50, radius=3.5,
-    R=30, lambda_step=0.01, plot_opts={'xlab': 't-SNE1', 'ylab': 't-SNE2'}):
+def kmeans_to_prepared_data(bow, index2word, centers, labels, radius=3.5,
+    n_candidate_words=50, n_printed_words=30, lambda_step=0.01,
+    plot_opts={'xlab': 't-SNE1', 'ylab': 't-SNE2'}):
 
     n_clusters = centers.shape[0]
     n_docs, n_terms = bow.shape
@@ -26,24 +27,36 @@ def kmeans_to_prepared_data(bow, index2word, centers, labels, n_words=50, radius
     for c, n_docs in enumerate(cluster_size):
         weighted_centers[c] = centers[c] * n_docs
 
-    topic_coordinates = _get_topic_coordinates(centers, cluster_size, radius)
-    topic_info = _get_topic_info(centers, cluster_size, index2word, weighted_centers, term_frequency, n_words=n_words)
-    token_table = _get_token_table(weighted_centers, topic_info, index2word)
+    # prepare parameters
+    topic_coordinates = _get_topic_coordinates(
+        centers, cluster_size, radius)
+
+    topic_info = _get_topic_info(
+        centers, cluster_size, index2word,
+        weighted_centers, term_frequency, n_candidate_words)
+
+    token_table = _get_token_table(
+        weighted_centers, topic_info, index2word)
+
     topic_order = cluster_size.argsort()[::-1].tolist()
 
+    # convert to pandas.DataFrame
     topic_coordinate_df = _df_topic_coordinate(topic_coordinates)
     topic_info_df = _df_topic_info(topic_info)
     token_table_df = _df_token_table(token_table)
 
+    # ready pyLDAvis.PreparedData
     prepared_data = pyLDAvis.PreparedData(
         topic_coordinate_df,
         topic_info_df,
         token_table_df,
-        R,
+        n_printed_words,
         lambda_step,
         plot_opts,
         topic_order
     )
+
+    # return
     return prepared_data
 
 def _get_token_table(weighted_centers, topic_info, index2word):
@@ -69,7 +82,8 @@ def _get_token_table(weighted_centers, topic_info, index2word):
 
     return token_table
 
-def _get_topic_info(centers, cluster_size, index2word, weighted_centers, term_frequency, n_words=100):
+def _get_topic_info(centers, cluster_size, index2word,
+    weighted_centers, term_frequency, n_candidate_words=100):
 
     TopicInfo = namedtuple(
         'TopicInfo',
@@ -86,7 +100,7 @@ def _get_topic_info(centers, cluster_size, index2word, weighted_centers, term_fr
     topic_info = []
 
     # Category: Default
-    default_terms = term_frequency.argsort()[::-1][:n_words]
+    default_terms = term_frequency.argsort()[::-1][:n_candidate_words]
     default_term_frequency = term_frequency[default_terms]
     default_term_loglift = 15 * default_term_frequency / default_term_frequency.max() + 10
     for term, freq, loglift in zip(default_terms, default_term_frequency, default_term_loglift):
@@ -114,7 +128,7 @@ def _get_topic_info(centers, cluster_size, index2word, weighted_centers, term_fr
         p_prop = l1_normalize(centers[c])
 
         indices = np.where(p_prop > 0)[0]
-        indices = sorted(indices, key=lambda idx:-p_prop[idx])[:n_words]
+        indices = sorted(indices, key=lambda idx:-p_prop[idx])[:n_candidate_words]
         scores = [(idx, p_prop[idx] / (p_prop[idx] + n_prop[idx])) for idx in indices]
 
         for term, loglift in scores:
