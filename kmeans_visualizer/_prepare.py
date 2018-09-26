@@ -10,7 +10,7 @@ from .utils import _df_topic_coordinate
 from .utils import _df_topic_info
 from .utils import _df_token_table
 
-def kmeans_to_prepared_data(bow, index2word, centers, labels, n_words=50,
+def kmeans_to_prepared_data(bow, index2word, centers, labels, n_words=50, radius=3.5,
     R=30, lambda_step=0.01, plot_opts={'xlab': 't-SNE1', 'ylab': 't-SNE2'}):
 
     n_clusters = centers.shape[0]
@@ -26,7 +26,7 @@ def kmeans_to_prepared_data(bow, index2word, centers, labels, n_words=50,
     for c, n_docs in enumerate(cluster_size):
         weighted_centers[c] = centers[c] * n_docs
 
-    topic_coordinates = _get_topic_coordinates(centers, cluster_size)
+    topic_coordinates = _get_topic_coordinates(centers, cluster_size, radius)
     topic_info = _get_topic_info(centers, cluster_size, index2word, weighted_centers, term_frequency, n_words=n_words)
     token_table = _get_token_table(weighted_centers, topic_info, index2word)
     topic_order = cluster_size.argsort()[::-1].tolist()
@@ -132,7 +132,7 @@ def _get_topic_info(centers, cluster_size, index2word, weighted_centers, term_fr
 
     return topic_info
 
-def _get_topic_coordinates(centers, cluster_size):
+def _get_topic_coordinates(centers, cluster_size, radius=5):
     TopicCoordinates = namedtuple(
         'TopicCoordinates',
         'topic x y topics cluster Freq'.split()
@@ -145,7 +145,7 @@ def _get_topic_coordinates(centers, cluster_size):
     cluster_size = np.asarray(
         [np.sqrt(cluster_size[c] + 1) for c in range(n_clusters)])
     cs_min, cs_max = cluster_size.min(), cluster_size.max()
-    cluster_size = 3.5 * (cluster_size - cs_min) / (cs_max - cs_min) + 0.2
+    cluster_size = radius * (cluster_size - cs_min) / (cs_max - cs_min) + 0.2
 
     topic_coordinates = [
         TopicCoordinates(c+1, coordinates[i,0], coordinates[i,1], i+1, 1, cluster_size[c])
