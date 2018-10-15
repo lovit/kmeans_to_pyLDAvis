@@ -5,14 +5,19 @@ from collections import Counter
 from collections import namedtuple
 from sklearn.preprocessing import normalize
 from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
 
 from .utils import _df_topic_coordinate
 from .utils import _df_topic_info
 from .utils import _df_token_table
 
-def kmeans_to_prepared_data(bow, index2word, centers, labels, radius=3.5,
-    n_candidate_words=50, n_printed_words=30, lambda_step=0.01,
-    plot_opts={'xlab': 't-SNE1', 'ylab': 't-SNE2'}):
+def kmeans_to_prepared_data(bow, index2word, centers, labels, method='tsne',
+    radius=3.5, n_candidate_words=50, n_printed_words=30, lambda_step=0.01):
+
+    if method == 'pca':
+        plot_opts={'xlab': 'PCA1', 'ylab': 'PCA2'}
+    else:
+        plot_opts={'xlab': 't-SNE1', 'ylab': 't-SNE2'}
 
     n_clusters = centers.shape[0]
     n_docs, n_terms = bow.shape
@@ -29,7 +34,7 @@ def kmeans_to_prepared_data(bow, index2word, centers, labels, radius=3.5,
 
     # prepare parameters
     topic_coordinates = _get_topic_coordinates(
-        centers, cluster_size, radius)
+        centers, cluster_size, radius, method)
 
     topic_info = _get_topic_info(
         centers, cluster_size, index2word,
@@ -146,14 +151,20 @@ def _get_topic_info(centers, cluster_size, index2word,
 
     return topic_info
 
-def _get_topic_coordinates(centers, cluster_size, radius=5):
+def _get_topic_coordinates(centers, cluster_size, radius=5, method='tsne'):
     TopicCoordinates = namedtuple(
         'TopicCoordinates',
         'topic x y topics cluster Freq'.split()
     )
 
     n_clusters = centers.shape[0]
-    coordinates = TSNE(n_components=2, metric='cosine').fit_transform(centers)
+
+    if method == 'pca:
+        coordinates = _coordinates_pca(centers)
+    else:
+        coordinates = _coordinates_tsne(centers)
+
+    # scaling
     coordinates = 5 * coordinates / max(coordinates.max(), abs(coordinates.min()))
 
     cluster_size = np.asarray(
@@ -168,3 +179,9 @@ def _get_topic_coordinates(centers, cluster_size, radius=5):
 
     topic_coordinates = sorted(topic_coordinates, key=lambda x:-x.Freq)
     return topic_coordinates
+
+def _coordinates_pca(centers):
+    return PCA(n_components=2).fit_transform(centers)
+
+def _coordinates_tsne(centers):
+    return = TSNE(n_components=2, metric='cosine').fit_transform(centers)
