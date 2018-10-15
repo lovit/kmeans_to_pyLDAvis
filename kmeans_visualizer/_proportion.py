@@ -162,7 +162,7 @@ def _get_topic_coordinates(centers, cluster_size,
 
     n_clusters = centers.shape[0]
 
-    if embedding_method == 'pca:
+    if embedding_method == 'pca':
         coordinates = _coordinates_pca(centers)
     else:
         coordinates = _coordinates_tsne(centers)
@@ -187,4 +187,4 @@ def _coordinates_pca(centers):
     return PCA(n_components=2).fit_transform(centers)
 
 def _coordinates_tsne(centers):
-    return = TSNE(n_components=2, metric='cosine').fit_transform(centers)
+    return TSNE(n_components=2, metric='cosine').fit_transform(centers)
