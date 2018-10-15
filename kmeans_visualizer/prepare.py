@@ -1,5 +1,5 @@
-from ._proportion import _kmeans_to_prepared_data_proportion_score
-from ._pyldavis import _kmeans_to_prepared_data_pyldavis_score
+from .proportion import _kmeans_to_prepared_data_proportion_score
+from .pyldavis import _kmeans_to_prepared_data_pyldavis_score
 
 
 def kmeans_to_prepared_data(bow, index2word, centers, labels,
