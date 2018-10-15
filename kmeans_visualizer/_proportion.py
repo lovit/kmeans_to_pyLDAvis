@@ -11,7 +11,7 @@ from .utils import _df_topic_coordinate
 from .utils import _df_topic_info
 from .utils import _df_token_table
 
-def _kmeans_to_prepared_data_proportion_scoring(bow, index2word,
+def _kmeans_to_prepared_data_proportion_score(bow, index2word,
     centers, labels, embedding_method='tsne', radius=3.5,
     n_candidate_words=50, n_printed_words=30, lambda_step=0.01):
 
