@@ -44,7 +44,7 @@ kmeans_to_prepared_data 함수는 이 과정을 거쳐 pyLDAvis 용 PreparedData
 
 pyLDAvis 를 이용하여 만들어진 prepared_data 를 display 하면 pyLDAvis 와 같은 그림을 얻을 수 있습니다.
 
-![](https://github.com/lovit/kmeans_to_pyLDAvis/blob/master/assets/kmeans_to_pyLDAvis_snapshot.png)
+![](https://github.com/lovit/kmeans_to_pyLDAvis/blob/master/assets/kmeans_to_pyldavis_snapshot.png)
 
 
 ## Requires
