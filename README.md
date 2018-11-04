@@ -6,17 +6,19 @@ pyLDAvis 를 이용하여 (Spherical) k-means 를 이용한 문서 군집화 학
 
 문서 군집화를 위해서는 Euclidean distance 가 아닌 Cosine distance 를 이용하는 Spherical k-means 을 이용해야 합니다. soyclustering 은 Cosine distance 용 fast initializer 와 clustering labeling 기능 및 Spherical k-means 을 제공합니다. 'similar_cut' 은 Cosine distance 용 initializer 입니다.
 
-    from soyclustering import SphericalKMeans
-    from soyclustering import proportion_keywords
+```python
+from soyclustering import SphericalKMeans
+from soyclustering import proportion_keywords
 
-    # spherical k-means
-    spherical_kmeans = SphericalKMeans(n_clusters=1000, max_iter=10, verbose=1, init='similar_cut‘)
-    labels = spherical_kmeans.fit_predict(x)
+# spherical k-means
+spherical_kmeans = SphericalKMeans(n_clusters=1000, max_iter=10, verbose=1, init='similar_cut‘)
+labels = spherical_kmeans.fit_predict(x)
 
-    # clustering labeling 
-    vocabs = ['this', 'is', 'vocab', 'list']
-    centers = kmeans.cluster_centers_
-    keywords = proportion_keywords(centers, labels, vocabs)
+# clustering labeling
+vocabs = ['this', 'is', 'vocab', 'list']
+centers = kmeans.cluster_centers_
+keywords = proportion_keywords(centers, labels, vocabs)
+```
 
 ### k-means + pyLDAvis
 
@@ -32,15 +34,17 @@ Spherical k-means 의 학습 결과 우리는 cluster centers 와 labels 를 얻
 
 kmeans_to_prepared_data 함수는 이 과정을 거쳐 pyLDAvis 용 PreparedData 를 만듭니다.
 
-    # k-means + pyLDAvis
-    import pyLDAvis
-    from kmeans_visualizer import kmeans_to_prepared_data
+```python
+# k-means + pyLDAvis
+import pyLDAvis
+from kmeans_visualizer import kmeans_to_prepared_data
 
-    prepared_data = kmeans_to_prepared_data(
-        x, index2word, centers, labels,
-        embedding_method='tsne'
-    )
-    pyLDAvis.display(prepared_data) 
+prepared_data = kmeans_to_prepared_data(
+    x, index2word, centers, labels,
+    embedding_method='tsne'
+)
+pyLDAvis.display(prepared_data)
+```
 
 pyLDAvis 를 이용하여 만들어진 prepared_data 를 display 하면 pyLDAvis 와 같은 그림을 얻을 수 있습니다.
 
