@@ -37,7 +37,7 @@ kmeans_to_prepared_data 함수는 이 과정을 거쳐 pyLDAvis 용 PreparedData
 ```python
 # k-means + pyLDAvis
 import pyLDAvis
-from kmeans_visualizer import kmeans_to_prepared_data
+from kmeans_to_pyLDAvis import kmeans_to_prepared_data
 
 prepared_data = kmeans_to_prepared_data(
     x, index2word, centers, labels,
